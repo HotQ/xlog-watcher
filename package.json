@@ -10,7 +10,9 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.helloWorld"
+		"onCommand:extension.helloWorld",
+		"onCommand:extension.showText",
+		"onCommand:extension.showTextSelection"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -18,8 +20,31 @@
 			{
 				"command": "extension.helloWorld",
 				"title": "Hello World"
+			},
+			{
+				"command": "extension.showText",
+				"title": "%extension.showText.title%"
+			},
+			{
+				"command": "extension.showTextSelection",
+				"title": "%extension.showTextSelection.title%"
 			}
-		]
+		],
+		"keybindings": [
+			{
+				"command": "extension.showTextSelection",
+				"key": "cmd+Alt+p"
+			}
+		],
+		"menus": {
+			"editor/context": [
+				{
+					"when": "editorFocus",
+					"command": "extension.showText",
+					"group": "6_px"
+				}
+			]
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
@@ -27,7 +52,10 @@
 		"lint": "eslint src --ext ts",
 		"watch": "tsc -watch -p ./",
 		"pretest": "npm run compile && npm run lint",
-		"test": "node ./out/test/runTest.js"
+		"test": "node ./out/test/runTest.js",
+		"cargo_build": "cd src/awwleegay && cargo build",
+		"gyp_build": "HOME=~/.electron-gyp node-gyp rebuild --target=6.0.0 --arch=x64 --dist-url=https://electronjs.org/headers",
+		"build": "npm run cargo_build && npm run gyp_build"
 	},
 	"devDependencies": {
 		"@types/glob": "^7.1.1",
@@ -41,5 +69,10 @@
 		"mocha": "^7.0.1",
 		"typescript": "^3.7.5",
 		"vscode-test": "^1.3.0"
+	},
+	"dependencies": {
+		"bindings": "^1.5.0",
+		"nan": "^2.14.0",
+		"node-gyp": "^6.1.0"
 	}
 }
