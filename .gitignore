@@ -3,3 +3,5 @@ build
 node_modules
 .vscode-test/
 *.vsix
+
+src/awwleegay/target
