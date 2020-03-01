@@ -10,3 +10,6 @@
     - [ ] string
     - [ ] regex
 - [x] Rust ↔ CPP ↔ Electron
+  - [x] mac
+  - [x] windows
+  - [ ] linux
