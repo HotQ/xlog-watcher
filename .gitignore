@@ -1,7 +1,17 @@
 out
 build
 node_modules
+
 .vscode-test/
+
+
+package-lock.json
+
+
 *.vsix
+*.log
+*.xlog
+
 
 src/awwleegay/target
+src/awwleegay/Cargo.lock

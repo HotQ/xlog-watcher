@@ -6,6 +6,8 @@ extern "C"
     char* rust_hello();
     void rust_capitalize(char *);
     int rust_add(int, int);
+    void rust_free_string(char *);
+    char* awwleegay_parse_xlog_to_file(char *,char *);
 }
 
 
@@ -17,7 +19,7 @@ void Hello(const Nan::FunctionCallbackInfo<v8::Value> &info)
     using namespace std;
     info.GetReturnValue().Set(Nan::New(str).ToLocalChecked());
 
-    free(str);//FIXME: need to run free() by Rust
+    rust_free_string(str);
 }
 
 void Add(const Nan::FunctionCallbackInfo<v8::Value> &info)
@@ -43,6 +45,32 @@ void Add(const Nan::FunctionCallbackInfo<v8::Value> &info)
     info.GetReturnValue().Set(num);
 }
 
+void ParseXlogToFile(const Nan::FunctionCallbackInfo<v8::Value> &info)
+{
+    v8::Local<v8::Context> context = info.GetIsolate()->GetCurrentContext();
+
+    if (info.Length() < 2)
+    {
+        Nan::ThrowTypeError("Wrong number of arguments");
+        return;
+    }
+
+    if (!info[0]->IsString() || !info[1]->IsString())
+    {
+        Nan::ThrowTypeError("Wrong arguments");
+        return;
+    }
+
+    v8::String::Utf8Value src(info[0]->ToString());
+    v8::String::Utf8Value dst(info[1]->ToString());
+
+    auto debug_info_raw = awwleegay_parse_xlog_to_file(*src,*dst);
+    auto debug_info = Nan::New<v8::String>(debug_info_raw).ToLocalChecked();
+    rust_free_string(debug_info_raw);
+
+    info.GetReturnValue().Set(debug_info);
+}
+
 #define export_native_to_node(native_method, node_method) \
     (void)exports->Set(                                   \
         context,                                          \
@@ -55,6 +83,7 @@ void Init(v8::Local<v8::Object> exports)
 
     export_native_to_node(Hello, "hello");
     export_native_to_node(Add, "add");
+    export_native_to_node(ParseXlogToFile, "parse_xlog_to_file");
 }
 
 NODE_MODULE(hello, Init)

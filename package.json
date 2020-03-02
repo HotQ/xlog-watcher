@@ -53,6 +53,7 @@
 		"watch": "tsc -watch -p ./",
 		"pretest": "npm run compile && npm run lint",
 		"test": "node ./out/test/runTest.js",
+		"cargo_win": "cd src/awwleegay && rustup run stable-x86_64-pc-windows-msvc cargo build",
 		"cargo_build": "cd src/awwleegay && cargo build",
 		"gyp_build": "HOME=~/.electron-gyp node-gyp rebuild --target=6.0.0 --arch=x64 --dist-url=https://electronjs.org/headers",
 		"build": "npm run cargo_build && npm run gyp_build"

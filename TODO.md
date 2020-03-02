@@ -9,6 +9,12 @@
     - [ ] filter
     - [ ] string
     - [ ] regex
+- [ ] Xlog processing
+  - [x] decode xlog file 
+  - [ ] abs path
+    - [ ] mac
+    - [ ] windows
+    - [ ] linux
 - [x] Rust ↔ CPP ↔ Electron
   - [x] mac
   - [x] windows

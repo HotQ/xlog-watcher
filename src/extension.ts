@@ -12,6 +12,10 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerTextEditorCommand('extension.showTextSelection', selection_text_in_editor);
 
 	let disposable = vscode.commands.registerCommand('extension.helloWorld', () => {
+		var info1 = addon.parse_xlog_to_file("\\\\?\\E:\\CODER\\xlog-watcher\\compressed.xlog","E:\\CODER\\xlog-watcher\\sdafs.log");
+		var info2 = addon.parse_xlog_to_file("E:\\CODER\\xlog-watcher\\compressed.xlog","E:\\CODER\\xlog-watcher\\dfghret.log");
+		show("debug_info1: "+info1);
+		show("debug_info2: "+info2);
 		show(addon.hello() + '!   212414+64252='+addon.add(212414,64252));
 	});
 
