@@ -1,3 +1,4 @@
+use crate::utils::*;
 use flate2::bufread::DeflateDecoder;
 use std::fs::{File, OpenOptions};
 use std::io::prelude::*;
@@ -109,7 +110,7 @@ fn parse_file(src_file: &str) -> std::io::Result<Vec<(LogBufferMeta, String)>> {
         match search_log_buffer(&mut buffer, search_start) {
             Some(meta) => {
                 let s = decode_log_buffer(&mut buffer, &meta)?;
-                search_start = meta.offset + meta.length as usize;
+                search_start = meta.offset + CODE_OFFSET + meta.length as usize + 1;
                 decode_result.push((meta, s));
             }
             None => break,
@@ -120,13 +121,34 @@ fn parse_file(src_file: &str) -> std::io::Result<Vec<(LogBufferMeta, String)>> {
 
 pub(crate) fn parse_to_file(src_file: &str, dst_file: &str) -> std::io::Result<()> {
     let decode_result = parse_file(src_file)?;
+    stmp("Done parse_file");
 
-    let mut file = OpenOptions::new().create(true).write(true).open(dst_file)?;
-
-    for (meta, log) in decode_result {
-        println!("{:?}", meta);
-        file.write(log.as_bytes())?;
+    let mut file = OpenOptions::new()
+        .create_new(true)
+        .write(true)
+        .open(dst_file)?;
+    let mut final_log = String::new();
+    for (_meta, log) in decode_result {
+        final_log.push_str(&log);
     }
+    file.write(final_log.as_bytes())?;
+
+    stmp("Done parse_to_file");
 
     Ok(())
+}
+
+pub(crate) fn parse_to_file_tmp(src_file: &str) -> std::io::Result<std::path::PathBuf> {
+    let dst_file = crate::utils::gen_tmp_path(src_file)?;
+    parse_to_file(src_file, &dst_file.display().to_string())?;
+    Ok(dst_file)
+}
+
+pub(crate) fn parse_to_string(src_file: &str) -> std::io::Result<String> {
+    let decode_result = parse_file(src_file)?;
+    let mut ret_log = String::new();
+    for (_, log) in decode_result {
+        ret_log.push_str(&log);
+    }
+    Ok(ret_log)
 }

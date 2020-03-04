@@ -10,9 +10,7 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.helloWorld",
-		"onCommand:extension.showText",
-		"onCommand:extension.showTextSelection"
+		"*"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -28,6 +26,10 @@
 			{
 				"command": "extension.showTextSelection",
 				"title": "%extension.showTextSelection.title%"
+			},
+			{
+				"command": "extension.decodeXlog",
+				"title": "Show Xlog"
 			}
 		],
 		"keybindings": [
@@ -43,7 +45,13 @@
 					"command": "extension.showText",
 					"group": "6_px"
 				}
-			]
+			],
+			"editor/title": [
+				{
+				  "command": "extension.decodeXlog",
+				  "group": "navigation"
+				}
+			  ]
 		}
 	},
 	"scripts": {
