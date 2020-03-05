@@ -124,7 +124,7 @@ pub(crate) fn parse_to_file(src_file: &str, dst_file: &str) -> std::io::Result<(
     stmp("Done parse_file");
 
     let mut file = OpenOptions::new()
-        .create_new(true)
+        .create(true)
         .write(true)
         .open(dst_file)?;
     let mut final_log = String::new();
@@ -151,4 +151,32 @@ pub(crate) fn parse_to_string(src_file: &str) -> std::io::Result<String> {
         ret_log.push_str(&log);
     }
     Ok(ret_log)
+}
+
+mod tests {
+    // use chrono::prelude::*;
+    use crate::utils::*;
+    #[test]
+    fn parse_0222() {
+        let src_file = "lark_20200222.xlog";
+        match crate::xlog_decode::parse_to_string(&src_file) {
+            Ok(_) => (),
+            Err(e) => println! {"shit happen when parse xlog to string: {:?}",e},
+        };
+        println!("shit");
+    }
+    // const app_name:&'static str = "xlog_watcher";
+    #[test]
+    fn parse_0222_to_tmp() -> std::io::Result<()> {
+        let src_file = "lark.mmap2.xlog";
+        let dst_file = "lark_20200222.xlog.log";
+        // let a = crate::utils::gen_tmp_path(src_file)?;
+        // stmp("Done gen_tmp_path");
+
+        // if let Err(e) = crate::xlog_decode::parse_to_file(src_file, &a.display().to_string()) {
+            if let Err(e) = crate::xlog_decode::parse_to_file(src_file, dst_file) {
+                println!("{:?}",  e);
+        }
+        Ok(())
+    }
 }

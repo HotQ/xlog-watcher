@@ -7,15 +7,16 @@
 - [ ] `P0`  Base functions
   - [ ] raw-log view window
   - [ ] filter line
-    - [ ] search
-    - [ ] filter
-    - [ ] string
+    - [x] select
+    - [x] delete
+    - [x] string
     - [ ] regex
 - [ ] `P1` Syntax highlighting
 - [ ] `P2` Fancy Requirement
   - [ ] Time range filtering
   - [ ] Jump
   - [ ] Hover tips
+    - [ ] "search by this", time, cid
 - [ ] `P1` Optimization
   - [ ] hold xlog file's hash to avoid repeat decoding
 - [ ] `P0` Xlog processing
@@ -32,7 +33,7 @@
 
 ## 框架
 1. xlog文件和decode后的内容都较大，所以log文件[[1]](#1)需要持久化到硬盘上。
-2. 在对log文件执行过滤/删除操作的时候会弹出virtual document，重复操作会刷新[[2]](#2)virtual document，另存为[[3]](#3)后可以将过滤结果保存为普通文件。
+2. 在对log文件执行过滤/删除操作的时候会弹出virtual document，重复操作会新增virtual document，另存为[[3]](#3)后可以将过滤结果保存为普通文件。
 
 ## 问题
 - 将xlog文件解压为xlog.log文件并打开
@@ -45,5 +46,4 @@
 ###### 注
 
 <span id="1">1. 后缀为xlog.log
-<span id="2">2. 新建还是刷新？
 <span id="3">3. 有无必要增加一个命令/按钮/快捷键来快速保存过滤结果的log？

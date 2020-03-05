@@ -1,9 +1,12 @@
+#![allow(unused_imports, dead_code)]
 extern crate chrono;
 
 #[macro_use]
 pub(crate) mod utils;
+pub(crate) mod log_filter;
 pub(crate) mod xlog_decode;
 
+use log_filter::*;
 use std::ffi::{CStr, CString};
 use std::os::raw::{c_char, c_int};
 use utils::*;
@@ -88,6 +91,23 @@ pub extern "C" fn awwleegay_parse_xlog_to_string(src_file: *const c_char) -> *mu
         Err(e) => format! {"shit happen when parse xlog to string: {:?}",e},
     };
     string_to_c_str(&log)
+}
+
+#[no_mangle]
+pub extern "C" fn rust_filter_line(
+    command: i64,
+    pattern_type: i64,
+    pattern: *const c_char,
+    file_source: i64,
+    source_str: *const c_char,
+) -> *mut c_char  {
+    let pattern = unsafe { CStr::from_ptr(pattern).to_string_lossy() };
+    let source_str = unsafe { CStr::from_ptr(source_str).to_string_lossy() };
+    let filter_str = match filter_line(command, pattern_type, &pattern, file_source, &source_str) {
+        Ok(s) => s,
+        Err(e) => format!("shit happen when excu rust_filter_line {:?}", e),
+    };
+    string_to_c_str(&filter_str)
 }
 
 #[cfg(test)]

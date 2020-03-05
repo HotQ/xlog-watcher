@@ -1,6 +1,7 @@
 {
 	"name": "xlog-watcher",
 	"displayName": "xlog watcher",
+	"publisher": "HotQ",
 	"description": "check check!",
 	"version": "0.0.1",
 	"engines": {
@@ -25,11 +26,19 @@
 			},
 			{
 				"command": "extension.showTextSelection",
-				"title": "%extension.showTextSelection.title%"
+				"title": "showText Selection"
 			},
 			{
 				"command": "extension.decodeXlog",
 				"title": "Show Xlog"
+			},
+			{
+				"command": "extension.selectString",
+				"title": "Select String"
+			},
+			{
+				"command": "extension.deleteString",
+				"title": "Delect String"
 			}
 		],
 		"keybindings": [
@@ -39,19 +48,36 @@
 			}
 		],
 		"menus": {
-			"editor/context": [
+			"explorer/context": [
 				{
-					"when": "editorFocus",
-					"command": "extension.showText",
-					"group": "6_px"
+					"when": "!explorerResourceIsFolder",
+					"command": "extension.selectString",
+					"group": "2_xlogWather@1"
+				},
+				{
+					"when": "!explorerResourceIsFolder",
+					"command": "extension.deleteString",
+					"group": "2_xlogWather@2"
+				}
+			],
+			"editor/title/context": [
+				{
+					"when": "!explorerResourceIsFolder",
+					"command": "extension.selectString",
+					"group": "2_xlogWather@1"
+				},
+				{
+					"when": "!explorerResourceIsFolder",
+					"command": "extension.deleteString",
+					"group": "2_xlogWather@2"
 				}
 			],
 			"editor/title": [
 				{
-				  "command": "extension.decodeXlog",
-				  "group": "navigation"
+					"command": "extension.decodeXlog",
+					"group": "navigation"
 				}
-			  ]
+			]
 		}
 	},
 	"scripts": {

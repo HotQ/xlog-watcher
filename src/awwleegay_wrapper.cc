@@ -4,21 +4,21 @@
 
 extern "C"
 {
-    char* rust_hello();
+    char *rust_hello();
     void rust_capitalize(char *);
     int rust_add(int, int);
     void rust_free_string(char *);
-    void rust_free_vec_string(char*[2]);
-    char* awwleegay_parse_xlog_to_file(char *,char *);
-    char* awwleegay_parse_xlog_to_string(char *);
-    char** awwleegay_parse_xlog_to_file_tmp(char *);
+    void rust_free_vec_string(char * [2]);
+    char *awwleegay_parse_xlog_to_file(char *, char *);
+    char *awwleegay_parse_xlog_to_string(char *);
+    char **awwleegay_parse_xlog_to_file_tmp(char *);
+    char *rust_filter_line(int, int, char *, int, char *);
 }
-
 
 void Hello(const Nan::FunctionCallbackInfo<v8::Value> &info)
 {
 
-    char* str = rust_hello();
+    char *str = rust_hello();
     rust_capitalize(str);
     using namespace std;
     info.GetReturnValue().Set(Nan::New(str).ToLocalChecked());
@@ -68,7 +68,7 @@ void ParseXlogToFile(const Nan::FunctionCallbackInfo<v8::Value> &info)
     v8::String::Utf8Value src(info[0]->ToString());
     v8::String::Utf8Value dst(info[1]->ToString());
 
-    auto debug_info_raw = awwleegay_parse_xlog_to_file(*src,*dst);
+    auto debug_info_raw = awwleegay_parse_xlog_to_file(*src, *dst);
     auto debug_info = Nan::New<v8::String>(debug_info_raw).ToLocalChecked();
     rust_free_string(debug_info_raw);
 
@@ -92,17 +92,15 @@ void ParseXlogToFileTmp(const Nan::FunctionCallbackInfo<v8::Value> &info)
     }
 
     v8::String::Utf8Value src(info[0]->ToString());
-    
     std::time_t t = std::time(NULL);
 
     auto debug_info_raw = awwleegay_parse_xlog_to_file_tmp(*src); // FIXME: should pass ptr from c++ to rust
-    char* i [2] = {debug_info_raw[0],debug_info_raw[1]};
+    char *i[2] = {debug_info_raw[0], debug_info_raw[1]};
 
     auto v8Array = Nan::New<v8::Array>();
 
     Nan::Set(v8Array, 0, Nan::New<v8::String>(i[0]).ToLocalChecked());
     Nan::Set(v8Array, 1, Nan::New<v8::String>(i[1]).ToLocalChecked());
-
 
     char mbstr[100];
     std::strftime(mbstr, sizeof(mbstr), "%H:%M:%S%.3f", std::localtime(&t));
@@ -110,7 +108,6 @@ void ParseXlogToFileTmp(const Nan::FunctionCallbackInfo<v8::Value> &info)
 
     info.GetReturnValue().Set(v8Array);
 }
-
 
 void ParseXlogToString(const Nan::FunctionCallbackInfo<v8::Value> &info)
 {
@@ -137,6 +134,35 @@ void ParseXlogToString(const Nan::FunctionCallbackInfo<v8::Value> &info)
     info.GetReturnValue().Set(log);
 }
 
+void FilterLine(const Nan::FunctionCallbackInfo<v8::Value> &info)
+{
+    v8::Local<v8::Context> context = info.GetIsolate()->GetCurrentContext();
+
+    if (info.Length() != 5)
+    {
+        Nan::ThrowTypeError("Wrong number of arguments");
+        return;
+    }
+
+    if (!info[0]->IsNumber() || !info[1]->IsNumber() || !info[2]->IsString() || !info[3]->IsNumber() || !info[4]->IsString())
+    {
+        Nan::ThrowTypeError("Wrong arguments");
+        return;
+    }
+
+    int command = info[0]->NumberValue(context).FromJust();
+    int pattern_type = info[1]->NumberValue(context).FromJust();
+    v8::String::Utf8Value pattern(info[2]->ToString());
+    int file_source = info[3]->NumberValue(context).FromJust();
+    v8::String::Utf8Value source(info[4]->ToString());
+
+    auto filtered_raw = rust_filter_line(command, pattern_type, *pattern, file_source, *source);
+    auto filtered_str = Nan::New<v8::String>(filtered_raw).ToLocalChecked();
+    rust_free_string(filtered_raw);
+
+    info.GetReturnValue().Set(filtered_str);
+}
+
 #define export_native_to_node(native_method, node_method) \
     (void)exports->Set(                                   \
         context,                                          \
@@ -149,9 +175,10 @@ void Init(v8::Local<v8::Object> exports)
 
     export_native_to_node(Hello, "hello");
     export_native_to_node(Add, "add");
-    export_native_to_node(ParseXlogToFile,    "parse_xlog_to_file");
+    export_native_to_node(ParseXlogToFile, "parse_xlog_to_file");
     export_native_to_node(ParseXlogToFileTmp, "parse_xlog_to_file_tmp");
-    export_native_to_node(ParseXlogToString,  "parse_xlog_to_string");
+    export_native_to_node(ParseXlogToString, "parse_xlog_to_string");
+    export_native_to_node(FilterLine, "filter_line");
 }
 
 NODE_MODULE(hello, Init)
